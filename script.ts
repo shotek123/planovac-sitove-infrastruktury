@@ -69,3 +69,65 @@ abstract class NetworkDevice {
     abstract calculateThroughput(): number;
 }
 
+class Router extends NetworkDevice {
+    private wanSpeed: number;
+
+    constructor(id: string, name: string, price: number, powerConsumption: number, wanSpeed: number) {
+        super(id, name, price, powerConsumption);
+
+        if (wanSpeed < 0) {
+            throw new Error("WAN rychlost nesmí být záporná");
+        }
+
+        this.wanSpeed = wanSpeed;
+    }
+
+    public getWanSpeed(): number {
+        return this.wanSpeed;
+    }
+
+    public calculateThroughput(): number {
+        return this.wanSpeed;
+    }
+}
+
+/**
+ * Switch - druhý konkrétní typ síťového zařízení.
+ * Dědí všechny společné vlastnosti z NetworkDevice.
+ * Navíc si přidává počet portů a rychlost jednoho portu.
+ */
+class Switch extends NetworkDevice {
+    private portCount: number;
+    private portSpeed: number;
+
+    constructor(id: string, name: string, price: number, powerConsumption: number, portCount: number, portSpeed: number) {
+        super(id, name, price, powerConsumption);
+
+        if (portCount < 0) {
+            throw new Error("Počet portů nesmí být záporný");
+        }
+        if (portSpeed < 0) {
+            throw new Error("Rychlost portu nesmí být záporná");
+        }
+
+        this.portCount = portCount;
+        this.portSpeed = portSpeed;
+    }
+
+    public getPortCount(): number {
+        return this.portCount;
+    }
+
+    public getPortSpeed(): number {
+        return this.portSpeed;
+    }
+
+    /**
+     * Implementace abstraktní metody z rodiče.
+     * U switche se propustnost počítá jako součet rychlostí všech portů.
+     */
+    public calculateThroughput(): number {
+        return this.portCount * this.portSpeed;
+    }
+}
+
