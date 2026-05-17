@@ -103,3 +103,36 @@ class Switch extends NetworkDevice {
         return this.portCount * this.portSpeed;
     }
 }
+// =============================================================
+// HLAVNÍ LOGIKA - test funkčnosti tříd v konzoli
+// =============================================================
+/**
+ * Funkce, která z prostých dat v katalogu vytvoří instance tříd.
+ * Podle vlastnosti "type" rozhodne, zda vytvoří Router nebo Switch.
+ */
+function vytvoritZarizeni(data) {
+    if (data.type === 'router') {
+        return new Router(data.id, data.name, data.price, data.powerConsumption, data.wanSpeed);
+    }
+    else {
+        return new Switch(data.id, data.name, data.price, data.powerConsumption, data.portCount, data.portSpeed);
+    }
+}
+// Vytvoření pole instancí z katalogu (= "oživení" surových dat)
+const zarizeni = katalog.map(vytvoritZarizeni);
+// Výpis do konzole - polymorfní volání metod
+console.log("=== Inventář síťových zařízení ===\n");
+let celkovaCena = 0;
+let celkovaSpotreba = 0;
+let celkovaPropustnost = 0;
+for (const z of zarizeni) {
+    console.log(z.getInfo());
+    console.log(`  → propustnost: ${z.calculateThroughput()} Mbps\n`);
+    celkovaCena += z.getPrice();
+    celkovaSpotreba += z.getPowerConsumption();
+    celkovaPropustnost += z.calculateThroughput();
+}
+console.log("=== Souhrn sítě ===");
+console.log(`Celková cena: ${celkovaCena} Kč`);
+console.log(`Celková spotřeba: ${celkovaSpotreba} W`);
+console.log(`Celková propustnost: ${celkovaPropustnost} Mbps`);
