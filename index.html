@@ -7,7 +7,41 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <header>
+    <h1>Plánovač síťové infrastruktury</h1>
+    <p>Sestav si síť a spočítej cenu, spotřebu a propustnost</p>
+</header>
+
+<main>
+    <section class="catalog">
+        <h2>Katalog zařízení</h2>
+        <div id="catalog-list"></div>
+    </section>
+
+    <section class="network">
+        <h2>Moje síť</h2>
+        <div id="network-list">
+            <p class="empty">Zatím nic. Přidej zařízení z katalogu.</p>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="summary">
+        <div class="metric">
+            <span class="label">Celková cena</span>
+            <span class="value" id="total-price">0 Kč</span>
+        </div>
+        <div class="metric">
+            <span class="label">Spotřeba</span>
+            <span class="value" id="total-power">0 W</span>
+        </div>
+        <div class="metric">
+            <span class="label">Propustnost</span>
+            <span class="value" id="total-throughput">0 Mbps</span>
+        </div>
+    </div>
+</footer>
 </body>
 <script src="data.js"></script>
 <script src="script.js"></script>
