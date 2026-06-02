@@ -1,3 +1,4 @@
+declare const katalog: any[];
 /**
  * Abstraktní třída reprezentující obecné síťové zařízení.
  * Slouží jako společný základ pro Router a Switch.
@@ -170,3 +171,14 @@ console.log("=== Souhrn sítě ===");
 console.log(`Celková cena: ${celkovaCena} Kč`);
 console.log(`Celková spotřeba: ${celkovaSpotreba} W`);
 console.log(`Celková propustnost: ${celkovaPropustnost} Mbps`);
+
+/**
+ * Funkce reagující na klik na tlačítko - vypíše počet zařízení v síti.
+ */
+function spocitejZarizeni(): void {
+    const pocet = zarizeni.length;
+    alert(`V síti je celkem ${pocet} zařízení.`);
+}
+
+// Najdi tlačítko v HTML a navěs na něj funkci spocitejZarizeni při kliku
+document.getElementById('btn-spocitej')?.addEventListener('click', spocitejZarizeni);

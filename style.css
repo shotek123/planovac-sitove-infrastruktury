@@ -96,3 +96,20 @@ footer {
     font-weight: bold;
     color: #2c3e50;
 }
+
+@media (max-width: 700px) {
+    main {
+        flex-direction: column;
+    }
+
+    .summary {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+
+
+}
