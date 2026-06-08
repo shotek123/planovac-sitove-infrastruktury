@@ -113,3 +113,54 @@ footer {
 
 
 }
+
+/* === KARTY ZAŘÍZENÍ === */
+
+.card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-name {
+    font-weight: bold;
+    font-size: 15px;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.card-info {
+    font-size: 13px;
+    color: #555;
+}
+
+/* Tlačítko v kartě */
+.card-button {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    align-self: flex-start;
+}
+
+.card-button:hover {
+    background-color: #34495e;
+}
+
+/* Tlačítko pro odebrání (v Moje síť) - jiná barva */
+.card-button-remove {
+    background-color: #c0392b;
+}
+
+.card-button-remove:hover {
+    background-color: #a93226;
+}

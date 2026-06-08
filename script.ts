@@ -1,4 +1,5 @@
 declare const katalog: any[];
+
 /**
  * Abstraktní třída reprezentující obecné síťové zařízení.
  * Slouží jako společný základ pro Router a Switch.
@@ -70,6 +71,11 @@ abstract class NetworkDevice {
     abstract calculateThroughput(): number;
 }
 
+/**
+ * Router - první konkrétní typ síťového zařízení.
+ * Dědí všechny společné vlastnosti z NetworkDevice.
+ * Navíc si přidává rychlost WAN portu.
+ */
 class Router extends NetworkDevice {
     private wanSpeed: number;
 
@@ -87,6 +93,10 @@ class Router extends NetworkDevice {
         return this.wanSpeed;
     }
 
+    /**
+     * Implementace abstraktní metody z rodiče.
+     * U routeru je propustnost rovna rychlosti WAN portu.
+     */
     public calculateThroughput(): number {
         return this.wanSpeed;
     }
@@ -133,7 +143,7 @@ class Switch extends NetworkDevice {
 }
 
 // =============================================================
-// HLAVNÍ LOGIKA - test funkčnosti tříd v konzoli
+// HLAVNÍ LOGIKA - vytvoření instancí z katalogu
 // =============================================================
 
 /**
@@ -151,34 +161,137 @@ function vytvoritZarizeni(data: any): NetworkDevice {
 // Vytvoření pole instancí z katalogu (= "oživení" surových dat)
 const zarizeni: NetworkDevice[] = katalog.map(vytvoritZarizeni);
 
-// Výpis do konzole - polymorfní volání metod
-console.log("=== Inventář síťových zařízení ===\n");
+// Pole zařízení, která uživatel přidal do "Moje síť"
+const mojeSit: NetworkDevice[] = [];
 
-let celkovaCena = 0;
-let celkovaSpotreba = 0;
-let celkovaPropustnost = 0;
-
-for (const z of zarizeni) {
-    console.log(z.getInfo());
-    console.log(`  → propustnost: ${z.calculateThroughput()} Mbps\n`);
-
-    celkovaCena += z.getPrice();
-    celkovaSpotreba += z.getPowerConsumption();
-    celkovaPropustnost += z.calculateThroughput();
-}
-
-console.log("=== Souhrn sítě ===");
-console.log(`Celková cena: ${celkovaCena} Kč`);
-console.log(`Celková spotřeba: ${celkovaSpotreba} W`);
-console.log(`Celková propustnost: ${celkovaPropustnost} Mbps`);
+// =============================================================
+// FÁZE 3 - PROPOJENÍ S DOM
+// =============================================================
 
 /**
- * Funkce reagující na klik na tlačítko - vypíše počet zařízení v síti.
+ * Vykreslí katalog zařízení do HTML.
+ * Pro každou instanci v poli zarizeni vytvoří kartu
+ * a vloží ji do div#catalog-list.
  */
-function spocitejZarizeni(): void {
-    const pocet = zarizeni.length;
-    alert(`V síti je celkem ${pocet} zařízení.`);
+function vykresliKatalog(): void {
+    const container = document.getElementById('catalog-list');
+    if (!container) return;
+    
+    // Vyprázdni existující obsah
+    container.innerHTML = '';
+    
+    // Pro každé zařízení v poli zarizeni vytvoř kartu
+    for (const z of zarizeni) {
+        const karta = document.createElement('div');
+        karta.className = 'card';
+        karta.innerHTML = `
+            <div class="card-name">${z.getName()}</div>
+            <div class="card-info">Cena: ${z.getPrice()} Kč</div>
+            <div class="card-info">Spotřeba: ${z.getPowerConsumption()} W</div>
+            <div class="card-info">Propustnost: ${z.calculateThroughput()} Mbps</div>
+            <button class="card-button" data-id="${z.getId()}">+ Přidat do sítě</button>
+        `;
+        container.appendChild(karta);
+    }
 }
 
-// Najdi tlačítko v HTML a navěs na něj funkci spocitejZarizeni při kliku
-document.getElementById('btn-spocitej')?.addEventListener('click', spocitejZarizeni);
+/**
+ * Funkce reaguje na klik na tlačítko "+ Přidat" v katalogu.
+ * Najde zařízení podle ID a přidá ho do "Moje síť".
+ */
+function pridejDoSite(id: string): void {
+    const zarizeniKPridani = zarizeni.find(z => z.getId() === id);
+    if (!zarizeniKPridani) return;
+    
+    mojeSit.push(zarizeniKPridani);
+    
+    vykresliMojeSit();
+    aktualizujSouhrn();
+}
+
+/**
+ * Vykreslí "Moje síť" - zařízení, která uživatel přidal.
+ */
+function vykresliMojeSit(): void {
+    const container = document.getElementById('network-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Pokud je síť prázdná, zobraz info text
+    if (mojeSit.length === 0) {
+        container.innerHTML = '<p class="empty">Zatím nic. Přidej zařízení z katalogu.</p>';
+        return;
+    }
+    
+    // Vykresli každé zařízení v síti jako kartu s tlačítkem "× Odebrat"
+    for (let i = 0; i < mojeSit.length; i++) {
+        const z = mojeSit[i];
+        const karta = document.createElement('div');
+        karta.className = 'card';
+        karta.innerHTML = `
+            <div class="card-name">${z.getName()}</div>
+            <div class="card-info">Cena: ${z.getPrice()} Kč</div>
+            <div class="card-info">Spotřeba: ${z.getPowerConsumption()} W</div>
+            <div class="card-info">Propustnost: ${z.calculateThroughput()} Mbps</div>
+            <button class="card-button card-button-remove" data-index="${i}">× Odebrat</button>
+        `;
+        container.appendChild(karta);
+    }
+}
+
+/**
+ * Přepočítá a aktualizuje souhrn ve footeru.
+ */
+function aktualizujSouhrn(): void {
+    let cena = 0;
+    let spotreba = 0;
+    let propustnost = 0;
+    
+    for (const z of mojeSit) {
+        cena += z.getPrice();
+        spotreba += z.getPowerConsumption();
+        propustnost += z.calculateThroughput();
+    }
+    
+    const elCena = document.getElementById('total-price');
+    const elSpotreba = document.getElementById('total-power');
+    const elPropustnost = document.getElementById('total-throughput');
+    
+    if (elCena) elCena.textContent = `${cena} Kč`;
+    if (elSpotreba) elSpotreba.textContent = `${spotreba} W`;
+    if (elPropustnost) elPropustnost.textContent = `${propustnost} Mbps`;
+}
+
+// =============================================================
+// EVENT LISTENERS - reakce na uživatelské akce
+// =============================================================
+
+// Globální event listener - klik kdekoliv na stránce
+document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    
+    // Klik na "+ Přidat" v katalogu
+    if (target.classList.contains('card-button') && !target.classList.contains('card-button-remove')) {
+        const id = target.getAttribute('data-id');
+        if (id) pridejDoSite(id);
+    }
+    
+    // Klik na "× Odebrat" v Moje síť
+    if (target.classList.contains('card-button-remove')) {
+        const indexStr = target.getAttribute('data-index');
+        if (indexStr) {
+            const index = parseInt(indexStr);
+            mojeSit.splice(index, 1);
+            vykresliMojeSit();
+            aktualizujSouhrn();
+        }
+    }
+});
+
+// =============================================================
+// INICIALIZACE - spustit při načtení stránky
+// =============================================================
+
+vykresliKatalog();
+vykresliMojeSit();
